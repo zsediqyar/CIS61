@@ -6,11 +6,10 @@ A dice function takes no arguments and returns a number from 1 to n
 Types of dice:
 
  -  Dice can be fair, meaning that they produce each possible outcome with equal
-    probability. Examples: four_sided, six_sided
+    probability.
 
- -  For testing functions that use dice, deterministic test dice always cycle
-    through a fixed sequence of values that are passed as arguments to the
-    make_test_dice function.
+ -  For testing functions that use dice, we use deterministic dice that always
+    cycle among a fixed set of values when rolled.
 """
 
 from random import randint
@@ -28,6 +27,8 @@ six_sided = make_fair_dice(6)
 def make_test_dice(*outcomes):
     """Return a die that cycles deterministically through OUTCOMES.
 
+    This function uses Python syntax/techniques not yet covered in this course.
+
     >>> dice = make_test_dice(1, 2, 3)
     >>> dice()
     1
@@ -39,9 +40,6 @@ def make_test_dice(*outcomes):
     1
     >>> dice()
     2
-
-    This function uses Python syntax/techniques not yet covered in this course.
-    The best way to understand it is by reading the documentation and examples.
     """
     assert len(outcomes) > 0, 'You must supply outcomes to make_test_dice'
     for o in outcomes:

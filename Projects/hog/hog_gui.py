@@ -1,17 +1,16 @@
 """A graphical user interface (GUI) for the game of Hog.
 
-This file uses many features of Python not yet covered in the course.
+This file uses many features of Python not yet covered in the course.  A lab
+later in the semester will review its implementation and let you extend it.
 """
-
-from tkinter import *
-import argparse
-import sys
-import tkinter as tk
 
 import hog
 import dice
 from ucb import main
 
+import tkinter as tk
+from tkinter import *
+import argparse
 
 #############
 # Utilities #
@@ -43,12 +42,6 @@ class TextWidget(BetterWidget):
     def text(self, value):
         return self.textvar.set(str(value))
 
-class Text(tk.Text):
-    """A Text is a text box."""
-    def __init__(self, parent, **kwargs):
-        kwargs.update(text_theme)
-        tk.Text.__init__(self, parent, **kwargs)
-
 class Label(TextWidget, tk.Label):
     """A Label is a text label."""
     def __init__(self, parent, **kwargs):
@@ -74,20 +67,6 @@ class Frame(BetterWidget, tk.Frame):
     def __init__(self, *args, **kwargs):
         kwargs.update(frame_theme)
         tk.Frame.__init__(self, *args, **kwargs)
-
-class IORedirector(object):
-    """A general class for redirecting I/O to this Text widget."""
-    def __init__(self, text_area):
-        self.text_area = text_area
-
-class StdoutRedirector(IORedirector):
-    """A class for redirecting stdout to this Text widget."""
-    def write(self, text):
-        self.text_area.insert(END, text)
-        self.text_area.see(END)
-
-    def flush(self):
-        pass  # No-op to prevent crash (https://stackoverflow.com/a/43014145).
 
 def name(who):
     """Return the name of a player."""
@@ -125,9 +104,10 @@ class HogGUI(Frame):
         self.init_rolls()
         self.init_dice()
         self.init_status()
-        self.init_messages()
         self.init_restart()
 
+        hog.six_sided = self.make_dice(6)
+        hog.four_sided = self.make_dice(4)
         self.computer, self.turn = computer, 0
         self.play()
 
@@ -175,8 +155,6 @@ class HogGUI(Frame):
         """
         self.dice_frames = [
             Frame(self).pack(),
-            Frame(self).pack(),
-            Frame(self).pack(),
             Frame(self).pack()
         ]
         self.dice = {
@@ -190,12 +168,6 @@ class HogGUI(Frame):
         """Creates child widgets associated with the game status. For example,
         Hog Wild is displayed here."""
         self.status_label = Label(self).pack()
-
-    def init_messages(self):
-        """Creates child widgets associated with game messages."""
-        self.messages = Text(self)
-        self.messages.pack()
-        sys.stdout = StdoutRedirector(self.messages)
 
     def init_restart(self):
         """Creates child widgets associated with restarting the game."""
@@ -227,22 +199,14 @@ class HogGUI(Frame):
         for i in range(10):
             self.dice[i].pack_forget()
 
-    def clear_messages(self):
-        self.messages.delete(1.0, END)
-
     def roll(self):
         """Verify and set the number of rolls based on user input. As
         per game rules, a valid number of rolls must be an integer
         greater than or equal to 0.
         """
-        self.clear_messages()
         result = self.roll_entry.text
-        try:
-            rolls = 10 >= int(result) >= 0
-            assert rolls, 'Rolls must be between 0 and 10, inclusive'
+        if result.isnumeric() and 10 >= int(result) >= 0:
             self.roll_verified.set(int(result))
-        except (ValueError, AssertionError) as e:
-            print(e)
 
     def switch(self, who=None):
         """Switches players. self.who is either 0 or 1."""
@@ -270,6 +234,8 @@ class HogGUI(Frame):
         self.s_labels[1].text = s1
         self.roll_label.text = name(self.who) +' will roll:'
         status = self.status_label.text
+        if hog.select_dice(score, opp_score) == hog.four_sided:
+            status += ' Hog Wild!'
         self.status_label.text = status
 
         if self.computer and self.who == self.turn:
@@ -305,13 +271,8 @@ class HogGUI(Frame):
         self.s_labels[1].text = '0'
         self.status_label.text = ''
         try:
-            commentary = hog.both(hog.announce_highest(0),
-                         hog.both(hog.announce_highest(1),
-                                  hog.announce_lead_changes()))
             score, opponent_score = hog.play(self.strategy,
-                                             self.strategy,
-                                             dice=self.make_dice(6),
-                                             say=commentary)
+                                             self.strategy)
         except HogGUIException:
             pass
         else:
@@ -326,7 +287,6 @@ class HogGUI(Frame):
         self.roll_verified.set(HogGUI.KILL)
         self.status_label.text = ''
         self.clear_dice()
-        self.clear_messages()
         self.play()
 
     def destroy(self):
@@ -341,8 +301,8 @@ def run_GUI(computer=False):
     """
     root = Tk()
     root.title('The Game of Hog')
-    root.minsize(520, 600)
-    root.geometry("520x600")
+    root.minsize(520, 400)
+    root.geometry("520x400")
 
     # Tkinter only works with GIFs
     HogGUI.IMAGES = {
@@ -365,7 +325,6 @@ select_bg = '#a6d785'
 bg='#ffffff'
 fg='#000000'
 font=('Arial', 14)
-height=5  # Lines
 
 frame_theme = {
     'bg': bg,
@@ -375,13 +334,6 @@ label_theme = {
     'font': font,
     'bg': bg,
     'fg': fg,
-}
-
-text_theme = {
-    'font': font,
-    'bg': bg,
-    'fg': fg,
-    'height': height,
 }
 
 button_theme = {
