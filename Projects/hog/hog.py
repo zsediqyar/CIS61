@@ -105,6 +105,7 @@ def play(strategy0, strategy1, goal=GOAL_SCORE):
     who = 0  # Which player is about to take a turn, 0 (first) or 1 (second)
     score, opponent_score = 0, 0
     "*** YOUR CODE HERE ***"
+
     return score, opponent_score  # You may wish to change this line.
 
 #######################
