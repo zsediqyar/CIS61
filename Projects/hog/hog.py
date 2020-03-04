@@ -39,7 +39,6 @@ def roll_dice(num_rolls, dice=six_sided):
 
 
 def free_bacon(score):
-    # return the points from score of rollilng 0 dice
     return max(score // 10, score % 10) + 1
 
 
@@ -91,7 +90,7 @@ def other(who):
     return 1 - who
 
 
-def play(strategy0, strategy1, goal=GOAL_SCORE):
+def play(strategy0, strategy1, score=0, opponent_score=0, goal=GOAL_SCORE):
     """Simulate a game and return the final scores of both players, with
     Player 0's score first, and Player 1's score second.
 
@@ -103,10 +102,34 @@ def play(strategy0, strategy1, goal=GOAL_SCORE):
     strategy1:  The strategy function for Player 1, who plays second.
     """
     who = 0  # Which player is about to take a turn, 0 (first) or 1 (second)
-    score, opponent_score = 0, 0
+    score, opponent_score, temp_score = 0, 0, 0
     "*** YOUR CODE HERE ***"
-
-    return score, opponent_score  # You may wish to change this line.
+    while score < goal and opponent_score < goal:
+        dice = select_dice(score, opponent_score)
+        if who == 0:
+            sc = score
+            temp_score = opponent_score
+            num_rolls = strategy0(sc, temp_score)
+        else:
+            sc = opponent_score
+            temp_score = score
+            num_rolls = strategy1(sc, opponent_score)
+        curr = take_turn(num_rolls, temp_score, dice)
+        if who == 0:
+            score = score + curr
+            if curr == 0:
+                opponent_score = opponent_score + num_rolls
+        else:
+            opponent_score = opponent_score + curr
+            if curr == 0:
+                score = score + num_rolls
+        if score == opponent_score:
+            a = score
+            b = opponent_score
+            score = b
+            opponent_score = a
+        who = other(who)
+    return score, opponent_score
 
 #######################
 # Phase 2: Strategies #
@@ -158,6 +181,13 @@ def make_averaged(fn, num_samples=1000):
     Thus, the average value is 6.0.
     """
     "*** YOUR CODE HERE ***"
+    def average(*args):
+        total, i = 0, 1
+        while i <= num_samples:
+            total += fn(*args)
+            i += 1
+        return total / num_samples
+    return average
 
 
 def max_scoring_num_rolls(dice=six_sided):
@@ -180,6 +210,15 @@ def max_scoring_num_rolls(dice=six_sided):
     10
     """
     "*** YOUR CODE HERE ***"
+    max_num, number_of_dice, count = 0, 10, 0
+    while number_of_dice > 0:
+        avgerage = make_averaged(roll_dice)(number_of_dice, dice)
+        max_num = max(max_num, avgerage)
+        if avgerage >= max_num:
+            count = number_of_dice
+        number_of_dice -= 1
+
+    return count
 
 
 def winner(strategy0, strategy1):
@@ -235,7 +274,26 @@ def bacon_strategy(score, opponent_score):
     0
     """
     "*** YOUR CODE HERE ***"
-    return 5  # Replace this statement
+    if free_bacon(opponent_score) >= BACON_MARGIN:
+        return 0
+    else:
+        return BASELINE_NUM_ROLLS  # Replace this statement
+
+
+def swap(num1, num2):
+    num1_first = num1 // 10
+    num1_second = num1 % 10
+    num1_swapped = (num1_second * 10) + num1_first
+    num2_first = num2 // 10
+    num2_second = num2 % 10
+    num2_swapped = (num2_second * 10) + num2_first
+    num1_score = abs(num1_first - num1_second)
+    num2_score = abs(num2_first - num2_second)
+    difference = num1_score - num2_score
+    if difference == 0:
+        return True
+    else:
+        return False
 
 
 def swap_strategy(score, opponent_score):
@@ -254,7 +312,14 @@ def swap_strategy(score, opponent_score):
     5
     """
     "*** YOUR CODE HERE ***"
-    return 5  # Replace this statement
+
+    score = free_bacon(opponent_score) + score
+    if score < opponent_score and swap(score, opponent_score):
+        return 0
+    elif free_bacon(opponent_score) >= BACON_MARGIN:
+        return 0
+    else:
+        return BASELINE_NUM_ROLLS  # Replace this statement
 
 
 def final_strategy(score, opponent_score):
@@ -263,7 +328,18 @@ def final_strategy(score, opponent_score):
     *** YOUR DESCRIPTION HERE ***
     """
     "*** YOUR CODE HERE ***"
-    return 5  # Replace this statement
+    points = (opponent_score // 10) - (opponent_score % 10) + 1
+
+    if (score + points + opponent_score) % 7 == 0 and points >= 4:
+        return 0
+    elif 2 * (score + 1) == opponent_score:
+        return swap_strategy(score, opponent_score, 10, 10)
+    elif (score + opponent_score) % 7 == 0:
+        return swap_strategy(score, opponent_score, 4, 3)
+    elif score < opponent_score:
+        return swap_strategy(score, opponent_score, 9, 6)
+    else:
+        return swap_strategy(score, opponent_score, 7, 4)
 
 
 ##########################

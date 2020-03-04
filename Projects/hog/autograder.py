@@ -1,9 +1,12 @@
 """Common utility functions for automatic grading."""
 
-import sys, os, traceback
+import sys
+import os
+import traceback
 from doctest import DocTestFinder, DocTestRunner
 from collections import namedtuple, defaultdict
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 import re
 import argparse
 
@@ -11,12 +14,14 @@ Test = namedtuple('Test', ['name', 'fn'])
 TESTS = []
 
 # set path for autograder to test current working directory
-sys.path[0:0] = [ os.getcwd() ]
+sys.path[0:0] = [os.getcwd()]
+
 
 def test(fn):
     """Decorator to register a test. A test returns a true value on failure."""
     TESTS.append(Test(fn.__name__, fn))
     return fn
+
 
 def test_all(project_name, tests=TESTS):
     """Run all TESTS. Exits with a useful code: 0 for ok, 1 for problems."""
@@ -33,27 +38,35 @@ def test_all(project_name, tests=TESTS):
         print()
     sys.exit(0)
 
+
 class TimeoutError(Exception):
     pass
 
+
 TIMEOUT = 20
+
+
 def test_eval(func, inputs, timeout=TIMEOUT, **kwargs):
     if type(inputs) is not tuple:
         inputs = (inputs,)
     result = timed(func, timeout, inputs, kwargs)
     return result
 
+
 def timed(func, timeout, args=(), kwargs={}):
     """Calls FUNC with arguments ARGS and keyword arguments KWARGS. If it takes
     longer than TIMEOUT seconds to finish executing, a TimeoutError will be
     raised."""
     from threading import Thread
+
     class ReturningThread(Thread):
         """Creates a daemon Thread with a result variable."""
+
         def __init__(self):
             Thread.__init__(self)
             self.daemon = True
             self.result = None
+
         def run(self):
             self.result = func(*args, **kwargs)
     submission = ReturningThread()
@@ -63,9 +76,10 @@ def timed(func, timeout, args=(), kwargs={}):
         raise TimeoutError("Evaluation timed out!")
     return submission.result
 
+
 def check_func(func, tests,
-               comp = lambda x, y: x == y,
-               in_print = repr, out_print = repr):
+               comp=lambda x, y: x == y,
+               in_print=repr, out_print=repr):
     """Test FUNC according to sequence TESTS.  Each item in TESTS consists of
     (I, V, D=None), where I is a tuple of inputs to FUNC (if not a tuple,
     (I,) is substituted) and V is the proper output according to comparison
@@ -95,6 +109,7 @@ def check_func(func, tests,
             code += 1
     return code
 
+
 def check_doctest(func_name, module, run=True):
     """Check that MODULE.FUNC_NAME doctest passes."""
     func = getattr(module, func_name)
@@ -102,7 +117,8 @@ def check_doctest(func_name, module, run=True):
     if not tests:
         print("No doctests found for " + func_name)
         return True
-    fn = lambda: DocTestRunner().run(tests[0])
+
+    def fn(): return DocTestRunner().run(tests[0])
     result = test_eval(fn, tuple())
     if result.failed != 0:
         print("A doctest example failed for " + func_name + ".")
@@ -115,13 +131,14 @@ def underline(s):
     print(s)
     print('='*len(s))
 
+
 def check_for_updates(index, filenames, version):
     print('You are running version', version, 'of the autograder')
     try:
         remotes = {}
         for file in filenames:
             remotes[file] = urllib.request.urlopen(
-                    os.path.join(index, file)).read().decode('utf-8')
+                os.path.join(index, file)).read().decode('utf-8')
     except urllib.error.URLError:
         print("Couldn't check remote autograder")
         return
@@ -130,7 +147,8 @@ def check_for_updates(index, filenames, version):
     if remote_version and remote_version.group(1) != version:
         print('Version', remote_version.group(1),
               'is available with new tests.')
-        prompt = input('Do you want to automatically download these files? [y/n]: ')
+        prompt = input(
+            'Do you want to automatically download these files? [y/n]: ')
         if 'y' in prompt.lower():
             for file in filenames:
                 with open(file, 'w') as new:
@@ -142,6 +160,7 @@ def check_for_updates(index, filenames, version):
             for file in filenames:
                 print('\t' + os.path.join(index, file))
             print()
+
 
 def run_tests(name, remote_index, autograder_files, version, **kwargs):
     parser = argparse.ArgumentParser(

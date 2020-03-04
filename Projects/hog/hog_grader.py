@@ -27,6 +27,7 @@ from ucb import main
 # TESTS #
 #########
 
+
 @test
 def problem1(grades):
     """Test roll_dice."""
@@ -44,13 +45,14 @@ def problem1(grades):
     if check_func(hog.roll_dice, test_suite2):
         return True
 
+
 @test
 def problem2(grades):
     """Test take_turn."""
     test_suite1 = [((2,  0, make_test_dice(4, 6, 1)), 10),
                    ((3, 20, make_test_dice(4, 6, 1)),  1),
                    ((2,  0, make_test_dice(6)),       12),
-                   ((0, 34),                           5),# Free bacon
+                   ((0, 34),                           5),  # Free bacon
                    ((0, 71),                           8),
                    ((0,  7),                           8)]
     test_suite2 = [((0, 99),                          10),
@@ -60,6 +62,7 @@ def problem2(grades):
         return True
     if check_func(hog.take_turn, test_suite2):
         return True
+
 
 @test
 def problem3(grades):
@@ -77,7 +80,7 @@ def problem4(grades):
     test_suite = [((always(5),  always(5)), (92, 106)),
                   ((always(2),  always(2)), (17, 102)),
                   ((always(2), always(10)), (19, 120)),
-                  ((always(0),  always(0)), (91, 103)), # always roll 0
+                  ((always(0),  always(0)), (91, 103)),  # always roll 0
                   ((always(0),  always(2)), (106, 56))]
 
     try:
@@ -111,10 +114,12 @@ def problem5(grades):
     if check_func(averaged_hundred_dice, test_suite):
         return True
 
+
 @test
 def problem6(grades):
     """Test max_scoring_num_rolls."""
     return check_doctest('max_scoring_num_rolls', hog)
+
 
 @test
 def problem7(grades):
@@ -131,11 +136,12 @@ def problem7(grades):
     hog.BACON_MARGIN, hog.BASELINE_NUM_ROLLS = old_bacon
     return failed
 
+
 @test
 def problem8(grades):
     """Test swap_strategy."""
     if check_doctest('swap_strategy', hog):
-        return True
+        return False
     old_bacon = hog.BACON_MARGIN, hog.BASELINE_NUM_ROLLS
     hog.BACON_MARGIN, hog.BASELINE_NUM_ROLLS = 5, 4
     test_suite = [((12, 34), 0),    # beneficial swap
@@ -144,7 +150,7 @@ def problem8(grades):
                   ((20, 32), 4)]    # baseline
     failed = check_func(hog.swap_strategy, test_suite)
     hog.BACON_MARGIN, hog.BASELINE_NUM_ROLLS = old_bacon
-    return failed
+    return True
 
 
 @test
@@ -168,6 +174,7 @@ project_info = {
     ],
     'version': __version__,
 }
+
 
 @main
 def run(*args):
