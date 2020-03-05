@@ -11,7 +11,7 @@ def if_this_not_that(i_list, this):
 
 
 sample = [1, 2, 3, 4, 5]
-if_this_not_that(sample, 3)
+# if_this_not_that(sample, 3)
 
 
 # QUESTION TWO
@@ -25,7 +25,7 @@ def couple(list_one, list_two):
 s = [1, 2, 3]
 b = [4, 5, 6]
 
-print(couple(s, b))
+# print(couple(s, b))
 
 
 # QUESTION THREE
@@ -36,7 +36,7 @@ def enumerate(s, start=0):
     return new_list
 
 
-print(enumerate('five', 5))
+# print(enumerate('five', 5))
 
 
 # QUESTION FOUR
@@ -50,7 +50,7 @@ def squares(n):
 
 seq = [8, 49, 8, 9, 2, 1, 100, 102]
 
-print(squares(seq))
+# print(squares(seq))
 
 
 # QUESTION FIVE
@@ -68,7 +68,7 @@ def flatten(lst):
 
 
 x = [1, [2, 3], 4]
-print(flatten(x))
+# print(flatten(x))
 
 # QUESTION SEVEN (OPTIONAL)
 
@@ -103,7 +103,7 @@ def distance(city1, city2):
 Berkeley = make_city('Berkeley', 6.5, 12)
 Sacramento = make_city('Sacramento', 2.5, 15)
 
-print(distance(Berkeley, Sacramento))
+# print(distance(Berkeley, Sacramento))
 
 
 # QUESTION NINE
