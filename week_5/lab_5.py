@@ -70,6 +70,40 @@ def flatten(lst):
 x = [1, [2, 3], 4]
 print(flatten(x))
 
-# QUESTION SEVEN
+# QUESTION SEVEN (OPTIONAL)
+
+
 # QUESTION EIGHT
+def make_city(name, lat, lon):
+    return [name, lat, lon]
+
+
+def get_name(s):
+    return s[0]
+
+
+def get_lat(s):
+    return s[1]
+
+
+def get_lon(s):
+    return s[2]
+
+
+def distance(city1, city2):
+    city_1_lat = get_lat(city1)
+    city_1_lon = get_lon(city1)
+    city_2_lat = get_lat(city2)
+    city_2_lon = get_lon(city2)
+    dis = sqrt(((city_1_lat - city_2_lat) ** 2) +
+               ((city_1_lon - city_2_lon) ** 2))
+    return dis
+
+
+Berkeley = make_city('Berkeley', 6.5, 12)
+Sacramento = make_city('Sacramento', 2.5, 15)
+
+print(distance(Berkeley, Sacramento))
+
+
 # QUESTION NINE
