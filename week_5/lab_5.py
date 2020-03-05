@@ -107,3 +107,24 @@ print(distance(Berkeley, Sacramento))
 
 
 # QUESTION NINE
+berkeley = make_city('Berkeley', 37.87, 112.26)
+stanford = make_city('Stanford', 34.05, 118.25)
+
+
+def closer_city(lat, lon, city1, city2):
+    city_1_lat = get_lat(city1)
+    city_1_lon = get_lon(city1)
+    city_2_lat = get_lat(city2)
+    city_2_lon = get_lon(city2)
+    city_1_distance = sqrt(((lat - city_1_lat) ** 2) +
+                           ((lon - city_1_lon) ** 2))
+    city_2_distance = sqrt(((lat - city_2_lat) ** 2) +
+                           ((lon - city_2_lon) ** 2))
+
+    if city_1_distance < city_2_distance:
+        return city1[0]
+    else:
+        return city2[0]
+
+
+print(closer_city(38.33, 121.44, berkeley, stanford))
